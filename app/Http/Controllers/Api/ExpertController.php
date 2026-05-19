@@ -186,9 +186,10 @@ class ExpertController extends Controller
             'schedules.*.is_active'  => 'nullable|boolean',
         ]);
 
-        // Hapus jadwal lama, ganti dengan yang baru
+        // Hapus semua jadwal lama
         ExpertSchedule::where('expert_id', $request->user()->id)->delete();
 
+        // Insert jadwal baru
         $schedules = collect($request->schedules)->map(function($schedule) use ($request) {
             return [
                 'expert_id'  => $request->user()->id,
@@ -203,12 +204,17 @@ class ExpertController extends Controller
 
         ExpertSchedule::insert($schedules->toArray());
 
+        // Return dikelompokkan per hari
+        $result = ExpertSchedule::where('expert_id', $request->user()->id)
+            ->get()
+            ->groupBy('day');
+
         return response()->json([
             'success' => true,
             'message' => 'Schedules saved successfully',
-            'data'    => ExpertSchedule::where('expert_id', $request->user()->id)->get(),
+            'data'    => $result,
         ]);
-    }
+    }    
 
     // ==================== MANAGE SPECIALIZATIONS ====================
     public function getSpecializations(Request $request)
