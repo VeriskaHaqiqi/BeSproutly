@@ -80,3 +80,14 @@ Route::prefix('consultations')->middleware('auth:sanctum')->group(function () {
     Route::post('/{id}/verify-payment',     [ConsultationController::class, 'verifyPayment']);
     Route::post('/{id}/end',                [ConsultationController::class, 'endConsultation']);
 });
+
+use App\Http\Controllers\Api\ChatController;
+
+// ==================== CHAT ROUTES ====================
+Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
+    Route::get('/unread-count',                 [ChatController::class, 'unreadCount']);
+    Route::get('/{consultationId}',             [ChatController::class, 'getMessages']);
+    Route::post('/{consultationId}',            [ChatController::class, 'sendMessage']);
+    Route::patch('/{consultationId}/read',      [ChatController::class, 'markAsRead']);
+    Route::delete('/message/{messageId}',       [ChatController::class, 'deleteMessage']);
+});
