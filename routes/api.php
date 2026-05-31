@@ -91,3 +91,20 @@ Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
     Route::patch('/{consultationId}/read',      [ChatController::class, 'markAsRead']);
     Route::delete('/message/{messageId}',       [ChatController::class, 'deleteMessage']);
 });
+
+use App\Http\Controllers\Api\RatingController;
+
+// ==================== RATING ROUTES ====================
+Route::prefix('ratings')->group(function () {
+
+    // Public routes
+    Route::get('/expert/{expertId}', [RatingController::class, 'expertRatingsPublic']);
+
+    // Protected routes
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/consultation/{consultationId}',   [RatingController::class, 'store']);
+        Route::get('/my-ratings',                       [RatingController::class, 'userRatings']);
+        Route::get('/expert-ratings',                   [RatingController::class, 'expertRatings']);
+        Route::get('/pending',                          [RatingController::class, 'pendingRatings']);
+    });
+});
