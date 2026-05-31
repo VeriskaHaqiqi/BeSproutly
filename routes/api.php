@@ -108,3 +108,21 @@ Route::prefix('ratings')->group(function () {
         Route::get('/pending',                          [RatingController::class, 'pendingRatings']);
     });
 });
+
+use App\Http\Controllers\Api\ProfileController;
+
+// ==================== PROFILE ROUTES ====================
+Route::prefix('profile')->middleware('auth:sanctum')->group(function () {
+
+    // Semua user
+    Route::get('/',                     [ProfileController::class, 'index']);
+    Route::put('/update',               [ProfileController::class, 'update']);
+    Route::post('/photo',               [ProfileController::class, 'uploadPhoto']);
+    Route::delete('/photo',             [ProfileController::class, 'deletePhoto']);
+    Route::put('/change-password',      [ProfileController::class, 'changePassword']);
+
+    // Expert only
+    Route::put('/expert',               [ProfileController::class, 'updateExpertProfile']);
+    Route::put('/bank-account',         [ProfileController::class, 'updateBankAccount']);
+    Route::post('/certificate',         [ProfileController::class, 'uploadCertificate']);
+});
