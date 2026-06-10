@@ -36,4 +36,15 @@ class Article extends BaseModel
     {
         return $this->hasMany(BookmarkedArticle::class, 'article_id');
     }
+
+    protected $appends = ['is_bookmarked'];
+
+    public function getIsBookmarkedAttribute()
+    {
+        $userId = auth('sanctum')->id() ?? request()->user()?->id;
+        if (!$userId) {
+            return false;
+        }
+        return $this->bookmarks()->where('user_id', $userId)->exists();
+    }
 }

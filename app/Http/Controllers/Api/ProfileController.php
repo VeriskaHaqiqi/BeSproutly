@@ -160,6 +160,10 @@ class ProfileController extends Controller
             'university'          => 'nullable|string|max:150',
             'years_of_experience' => 'nullable|integer|min:0',
             'description'         => 'nullable|string',
+            'certificate'         => 'nullable|string',
+            'diploma'             => 'nullable|string',
+            'session_fee'         => 'nullable|numeric|min:0',
+            'session_duration'    => 'nullable|integer|min:0',
         ]);
 
         $profile = ExpertProfile::where('user_id', $request->user()->id)->first();
@@ -175,6 +179,10 @@ class ProfileController extends Controller
             'university'          => $request->university          ?? $profile->university,
             'years_of_experience' => $request->years_of_experience ?? $profile->years_of_experience,
             'description'         => $request->description         ?? $profile->description,
+            'certificate'         => $request->certificate         ?? $profile->certificate,
+            'diploma'             => $request->diploma             ?? $profile->diploma,
+            'session_fee'         => $request->session_fee         ?? $profile->session_fee,
+            'session_duration'    => $request->session_duration    ?? $profile->session_duration,
         ]);
 
         return response()->json([

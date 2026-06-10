@@ -306,7 +306,7 @@ class ExpertController extends Controller
             ->where('expert_id', $request->user()->id)
             ->where('status', 'completed')
             ->latest()
-            ->paginate(10);
+            ->paginate(50);
 
         $totalIncome = \App\Models\Consultation::where('expert_id', $request->user()->id)
             ->where('status', 'completed')

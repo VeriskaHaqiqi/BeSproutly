@@ -99,4 +99,19 @@ class User extends Authenticatable
     {
         return $this->role === 'expert';
     }
+
+    // Append photo_url to JSON
+    protected $appends = ['photo_url'];
+
+    public function getPhotoUrlAttribute()
+    {
+        if (!$this->profile_photo) {
+            return null;
+        }
+        // If already a full URL, return as-is
+        if (str_starts_with($this->profile_photo, 'http')) {
+            return $this->profile_photo;
+        }
+        return url('storage/' . $this->profile_photo);
+    }
 }

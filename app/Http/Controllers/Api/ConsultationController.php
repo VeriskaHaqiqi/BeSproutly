@@ -249,14 +249,14 @@ class ConsultationController extends Controller
     {
         $status = $request->status;
 
-        $query = Consultation::with(['expert', 'expert.expertProfile', 'payment'])
+        $query = Consultation::with(['expert', 'expert.expertProfile', 'payment', 'rating'])
             ->where('user_id', $request->user()->id);
 
         if ($status) {
             $query->where('status', $status);
         }
 
-        $consultations = $query->latest()->paginate(10);
+        $consultations = $query->latest()->paginate(50);
 
         return response()->json([
             'success' => true,
@@ -276,14 +276,14 @@ class ConsultationController extends Controller
 
         $status = $request->status;
 
-        $query = Consultation::with(['user', 'payment'])
+        $query = Consultation::with(['user', 'payment', 'rating'])
             ->where('expert_id', $request->user()->id);
 
         if ($status) {
             $query->where('status', $status);
         }
 
-        $consultations = $query->latest()->paginate(10);
+        $consultations = $query->latest()->paginate(50);
 
         return response()->json([
             'success' => true,
@@ -341,7 +341,7 @@ class ConsultationController extends Controller
     // ==================== GET PAYMENT HISTORY ====================
     public function paymentHistory(Request $request)
     {
-        $consultations = Consultation::with(['expert', 'payment'])
+        $consultations = Consultation::with(['expert', 'payment', 'rating'])
             ->where('user_id', $request->user()->id)
             ->whereHas('payment')
             ->latest()

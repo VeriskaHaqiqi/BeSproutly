@@ -1,5 +1,14 @@
 <?php
 
+if (!class_exists('RequestParseBodyException')) {
+    class RequestParseBodyException extends \Exception {}
+}
+if (!function_exists('request_parse_body')) {
+    function request_parse_body(?array $options = null): array {
+        throw new RequestParseBodyException();
+    }
+}
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
@@ -17,4 +26,9 @@ require __DIR__.'/../vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-$app->handleRequest(Request::capture());
+try {
+    $app->handleRequest(Request::capture());
+} catch (\Throwable $e) {
+    file_put_contents(__DIR__.'/../storage/logs/real_error.log', $e->getMessage() . "\n" . $e->getTraceAsString() . "\n\n", FILE_APPEND);
+    throw $e;
+}
