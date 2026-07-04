@@ -12,16 +12,42 @@ use Illuminate\Support\Facades\Storage;
 
 class ExpertController extends Controller
 {
+    private function updateAvailabilityBasedOnSchedule($user)
+    {
+        if (!$user || !$user->expertProfile) return;
+        
+        $currentDay = now()->timezone('Asia/Jakarta')->format('l');
+        $currentTime = now()->timezone('Asia/Jakarta')->format('H:i:s');
+        
+        $isActiveNow = false;
+        if ($user->schedules && $user->schedules->isNotEmpty()) {
+            foreach ($user->schedules as $schedule) {
+                if ($schedule->day === $currentDay && $schedule->is_active) {
+                    if ($currentTime >= $schedule->start_time && $currentTime <= $schedule->end_time) {
+                        $isActiveNow = true;
+                        break;
+                    }
+                }
+            }
+        }
+        $user->expertProfile->availability_status = $isActiveNow ? 'available' : 'unavailable';
+    }
     // ==================== GET ALL EXPERTS ====================
     public function index(Request $request)
     {
-        $query = User::with(['expertProfile', 'specializations'])
+        $query = User::with(['expertProfile', 'specializations', 'schedules'])
             ->where('role', 'expert');
 
         // Filter available now
         if ($request->available_now == 'true') {
-            $query->whereHas('expertProfile', function($q) {
-                $q->where('availability_status', 'available');
+            $currentDay = now()->timezone('Asia/Jakarta')->format('l');
+            $currentTime = now()->timezone('Asia/Jakarta')->format('H:i:s');
+            
+            $query->whereHas('schedules', function($q) use ($currentDay, $currentTime) {
+                $q->where('day', $currentDay)
+                  ->where('is_active', true)
+                  ->where('start_time', '<=', $currentTime)
+                  ->where('end_time', '>=', $currentTime);
             });
         }
 
@@ -43,6 +69,11 @@ class ExpertController extends Controller
         }
 
         $experts = $query->paginate(10);
+        $experts->getCollection()->transform(function($user) {
+            $this->updateAvailabilityBasedOnSchedule($user);
+            unset($user->schedules);
+            return $user;
+        });
 
         return response()->json([
             'success' => true,
@@ -66,6 +97,8 @@ class ExpertController extends Controller
                 'message' => 'Expert not found',
             ], 404);
         }
+
+        $this->updateAvailabilityBasedOnSchedule($expert);
 
         return response()->json([
             'success' => true,

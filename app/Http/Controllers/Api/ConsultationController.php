@@ -36,7 +36,8 @@ class ConsultationController extends Controller
             ], 404);
         }
 
-        $platformFee = 3000;
+        $duration = $expertProfile->session_duration ?? 30; 
+        $platformFee = 2500;
         $totalAmount = $expertProfile->session_fee + $platformFee;
 
         // Buat konsultasi
@@ -45,6 +46,7 @@ class ConsultationController extends Controller
             'expert_id' => $request->expert_id,
             'topic'     => $request->topic,
             'fee'       => $expertProfile->session_fee,
+            'duration'  => $duration,
             'status'    => 'waiting_payment',
         ]);
 
