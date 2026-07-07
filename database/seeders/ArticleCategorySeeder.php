@@ -10,13 +10,11 @@ class ArticleCategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Indoor Plants'],
-            ['name' => 'Outdoor Plants'],
-            ['name' => 'Pest Control'],
-            ['name' => 'Hydroponics'],
-            ['name' => 'Soil Science'],
-            ['name' => 'Crop Management'],
-            ['name' => 'Technology'],
+            ['name' => 'Ornamental Plants'],
+            ['name' => 'Vegetables'],
+            ['name' => 'Food Crops'],
+            ['name' => 'Fruit Plants'],
+            ['name' => 'Herbs and Kitchen Spices'],
         ];
 
         DB::table('article_categories')->insert($categories);
