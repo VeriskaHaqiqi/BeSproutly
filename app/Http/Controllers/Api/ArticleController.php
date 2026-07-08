@@ -270,4 +270,31 @@ class ArticleController extends Controller
             'data'    => $bookmarks,
         ]);
     }
+
+    // ==================== UPLOAD CONTENT IMAGE (EXPERT ONLY) ====================
+    // Uploads a single image to be embedded inside an article's body
+    // (not the cover image). Returns the storage path so the app can
+    // embed a lightweight reference inside `content` instead of the
+    // raw file itself.
+    public function uploadContentImage(Request $request)
+    {
+        if ($request->user()->role !== 'expert') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only experts can upload article images',
+            ], 403);
+        }
+
+        $request->validate([
+            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $path = $request->file('image')->store('articles/content', 'public');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Image uploaded successfully',
+            'path'    => $path,
+        ]);
+    }
 }

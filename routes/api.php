@@ -34,6 +34,7 @@ Route::prefix('articles')->group(function () {
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/',                    [ArticleController::class, 'store']);
+        Route::post('/upload-image',        [ArticleController::class, 'uploadContentImage']);
         Route::post('/{id}',                [ArticleController::class, 'update']);
         Route::delete('/{id}',              [ArticleController::class, 'destroy']);
         Route::get('/user/my-articles',     [ArticleController::class, 'myArticles']);
