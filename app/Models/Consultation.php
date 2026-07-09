@@ -29,6 +29,45 @@ class Consultation extends BaseModel
         'fee' => 'decimal:2',
     ];
 
+    /**
+     * Every time a Consultation is loaded from the database (show,
+     * list endpoints, chat polling, etc.), automatically flip it to
+     * "completed" if it's still marked "active" but its scheduled end
+     * time has already passed. This is what makes sessions end on
+     * their own without needing the expert to press "End Session" --
+     * there's no cron job running on Railway, so this check-on-read
+     * approach is what keeps things up to date instead.
+     */
+    protected static function booted()
+    {
+        static::retrieved(function (Consultation $consultation) {
+            $consultation->autoCompleteIfExpired();
+        });
+    }
+
+    public function autoCompleteIfExpired(): bool
+    {
+        if (
+            $this->status === 'active' &&
+            $this->scheduled_end_at &&
+            now()->gte($this->scheduled_end_at)
+        ) {
+            $this->update([
+                'status'   => 'completed',
+                'ended_at' => $this->scheduled_end_at,
+            ]);
+
+            // Keep this consistent with the manual "End Session" path,
+            // which also increments the expert's total_consultations.
+            $expertProfile = ExpertProfile::where('user_id', $this->expert_id)->first();
+            $expertProfile?->increment('total_consultations');
+
+            return true;
+        }
+
+        return false;
+    }
+
     // Relasi ke user
     public function user()
     {
