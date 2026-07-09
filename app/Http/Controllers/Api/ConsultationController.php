@@ -164,8 +164,9 @@ class ConsultationController extends Controller
             $payment->update(['status' => 'verified']);
 
             // Ambil durasi sesi dari expert profile
-            $expertProfile = ExpertProfile::where('user_id', $consultation->expert_id)->first();
-            $sessionDuration = $expertProfile->session_duration ?? 60;
+            $sessionDuration = $consultation->duration ?? 30;
+            //$expertProfile = ExpertProfile::where('user_id', $consultation->expert_id)->first();
+            //$sessionDuration = $expertProfile->session_duration ?? 60;
 
             $consultation->update([
                 'status'           => 'active',

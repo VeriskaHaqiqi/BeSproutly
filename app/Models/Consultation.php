@@ -15,6 +15,7 @@ class Consultation extends BaseModel
         'expert_id',
         'topic',
         'fee',
+        'duration',
         'status',
         'started_at',
         'scheduled_end_at',
